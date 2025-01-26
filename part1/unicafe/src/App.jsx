@@ -9,17 +9,27 @@ const Header = () => {
 }
 
 const Statistics = (props) => {
-  return (
-    <div>
-      <h1>statistics</h1>
-      <div>good {props.good}</div>
-      <div>neutral {props.neutral}</div>
-      <div>bad {props.bad}</div>
-      <div>all {props.allStats}</div>
-      <div>average {props.allStats != 0 ? (props.average / props.allStats) : 0}</div>
-      <div>positive {props.allStats != 0 ? (props.good / props.allStats) * 100 : 0} %</div>
-    </div>
-  )
+  if(props.allStats > 0){
+    return (
+      <div>
+        <h1>statistics</h1>
+        <div>good {props.good}</div>
+        <div>neutral {props.neutral}</div>
+        <div>bad {props.bad}</div>
+        <div>all {props.allStats}</div>
+        <div>average {props.allStats != 0 ? (props.average / props.allStats) : 0}</div>
+        <div>positive {props.allStats != 0 ? (props.good / props.allStats) * 100 : 0} %</div>
+      </div>
+    )
+  }else{
+    return(
+      <div>
+        <h1>statistics</h1>
+        <div>No feedback given</div>
+      </div>
+    )
+  }
+  
 }
 
 const App = () => {
