@@ -8,6 +8,20 @@ const Header = () => {
   )
 }
 
+const Statistics = (props) => {
+  return (
+    <div>
+      <h1>statistics</h1>
+      <div>good {props.good}</div>
+      <div>neutral {props.neutral}</div>
+      <div>bad {props.bad}</div>
+      <div>all {props.allStats}</div>
+      <div>average {props.allStats != 0 ? (props.average / props.allStats) : 0}</div>
+      <div>positive {props.allStats != 0 ? (props.good / props.allStats) * 100 : 0} %</div>
+    </div>
+  )
+}
+
 const App = () => {
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
@@ -38,15 +52,13 @@ const App = () => {
       <button onClick={handleGoodClick}>good</button>
       <button onClick={handleNeutralClick}>neutral</button>
       <button onClick={handleBadClick}>bad</button>
-      <div>
-        <h1>statistics</h1>
-        <div>good {good}</div>
-        <div>neutral {neutral}</div>
-        <div>bad {bad}</div>
-        <div>all {allStats}</div>
-        <div>average {allStats != 0 ? (average / allStats) : 0}</div>
-        <div>positive {allStats != 0 ? (good / allStats) * 100 : 0} %</div>
-      </div>
+      <Statistics
+        good={good}
+        bad={bad}
+        neutral={neutral}
+        average={average}
+        allStats={allStats}
+      />
     </div>
   )
 }
