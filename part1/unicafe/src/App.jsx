@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+// Header component
 const Header = () => {
   return (
     <>
@@ -8,17 +9,25 @@ const Header = () => {
   )
 }
 
+// StatisticLine component to display individual stat
+const StatisticLine = (props) => {
+  return (
+    <div>{props.text} {props.value}</div>
+  )
+}
+
+// Statistics component to wrap all stats into a single component
 const Statistics = (props) => {
   if(props.allStats > 0){
     return (
       <div>
         <h1>statistics</h1>
-        <div>good {props.good}</div>
-        <div>neutral {props.neutral}</div>
-        <div>bad {props.bad}</div>
-        <div>all {props.allStats}</div>
-        <div>average {props.allStats != 0 ? (props.average / props.allStats) : 0}</div>
-        <div>positive {props.allStats != 0 ? (props.good / props.allStats) * 100 : 0} %</div>
+        <StatisticLine text="good" value={props.good} />
+        <StatisticLine text="neutral" value={props.neutral} />
+        <StatisticLine text="bad" value={props.bad} />
+        <StatisticLine text="all" value={props.allStats} />
+        <StatisticLine text="average" value={props.allStats != 0 ? (props.average / props.allStats) : 0} />
+        <StatisticLine text="positive" value={`${props.allStats != 0 ? (props.good / props.allStats) * 100 : 0} %`} />
       </div>
     )
   }else{
@@ -28,8 +37,16 @@ const Statistics = (props) => {
         <div>No feedback given</div>
       </div>
     )
-  }
-  
+  }  
+}
+
+// Button component
+const Button = (props) => {
+  return (
+    <>
+      <button onClick={props.action}>{props.feedback}</button>
+    </>
+  )
 }
 
 const App = () => {
@@ -59,9 +76,9 @@ const App = () => {
   return (
     <div>
       <Header />
-      <button onClick={handleGoodClick}>good</button>
-      <button onClick={handleNeutralClick}>neutral</button>
-      <button onClick={handleBadClick}>bad</button>
+      <Button action={handleGoodClick} feedback="good" />
+      <Button action={handleNeutralClick} feedback="neutral" />
+      <Button action={handleBadClick} feedback="bad" />
       <Statistics
         good={good}
         bad={bad}
