@@ -12,7 +12,10 @@ const Header = () => {
 // StatisticLine component to display individual stat
 const StatisticLine = (props) => {
   return (
-    <div>{props.text} {props.value}</div>
+    <tr>
+      <td>{props.text}</td>
+      <td>{props.value}</td>
+    </tr>
   )
 }
 
@@ -22,12 +25,14 @@ const Statistics = (props) => {
     return (
       <div>
         <h1>statistics</h1>
-        <StatisticLine text="good" value={props.good} />
-        <StatisticLine text="neutral" value={props.neutral} />
-        <StatisticLine text="bad" value={props.bad} />
-        <StatisticLine text="all" value={props.allStats} />
-        <StatisticLine text="average" value={props.allStats != 0 ? (props.average / props.allStats) : 0} />
-        <StatisticLine text="positive" value={`${props.allStats != 0 ? (props.good / props.allStats) * 100 : 0} %`} />
+        <table>
+          <StatisticLine text="good" value={props.good} />
+          <StatisticLine text="neutral" value={props.neutral} />
+          <StatisticLine text="bad" value={props.bad} />
+          <StatisticLine text="all" value={props.allStats} />
+          <StatisticLine text="average" value={props.allStats != 0 ? (props.average / props.allStats) : 0} />
+          <StatisticLine text="positive" value={`${props.allStats != 0 ? (props.good / props.allStats) * 100 : 0} %`} />
+        </table>        
       </div>
     )
   }else{
