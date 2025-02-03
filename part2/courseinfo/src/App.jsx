@@ -17,20 +17,13 @@ const Part = (props) => {
 const Content = (props) => {
     const {parts} = props
     const part = parts.map((part, i) => <Part name={part.name} exercises={part.exercises}/>)
-    const total = (arr) => {
-        let sum = 0
-        for(let i = 0; i < arr.length; i++){
-            sum += arr[i].exercises;
-        }
-        return sum
-    }
+    const total = parts.reduce((acc, curr) => acc += curr.exercises, 0)
 
     return (
         <>
         {part}
-        <h4>total of {total(parts)} exercises</h4>
-        </>
-        
+        <h4>total of {total} exercises</h4>
+        </>       
     )
 }
 
