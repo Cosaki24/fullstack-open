@@ -15,31 +15,37 @@ const Part = (props) => {
 }
 
 const Content = (props) => {
-    const {parts} = props
-    const part = parts.map((part, i) => <Part name={part.name} exercises={part.exercises}/>)
+    const { parts } = props
+    const part = parts.map((part, i) => <Part name={part.name} exercises={part.exercises} />)
     const total = parts.reduce((acc, curr) => acc += curr.exercises, 0)
 
     return (
         <>
-        {part}
-        <h4>total of {total} exercises</h4>
-        </>       
+            {part}
+            <h4>total of {total} exercises</h4>
+        </>
     )
 }
 
 const Course = (props) => {
-    const {course} = props;
-    return (
+    const { courses } = props;
+    const course = courses.map((course, i) => {
+        return (
             <>
                 <Header title={course.name} />
                 <Content parts={course.parts} />
             </>
-        
+        )
+    })
+    return (
+        <>
+        {course}
+        </>
     )
 }
 
 const App = () => {
-    const course = {
+    const course = [{
         id: 1,
         name: 'Half Stack application development',
         parts: [
@@ -64,9 +70,26 @@ const App = () => {
                 id: 4
             }
         ]
+    },
+    {
+        name: 'Node.js',
+        id: 2,
+        parts: [
+            {
+                name: 'Routing',
+                exercises: 3,
+                id: 1
+            },
+            {
+                name: 'Middlewares',
+                exercises: 7,
+                id: 2
+            }
+        ]
     }
+    ]
 
-    return <Course course={course} />
+    return <Course courses={course} />
 }
 
 export default App
