@@ -1,48 +1,4 @@
-const Header = (props) => {
-    return (
-        <>
-            <h1>{props.title}</h1>
-        </>
-    )
-}
-
-const Part = (props) => {
-    return (
-        <>
-            <p>{props.name} {props.exercises}</p>
-        </>
-    )
-}
-
-const Content = (props) => {
-    const { parts } = props
-    const part = parts.map((part, i) => <Part name={part.name} exercises={part.exercises} />)
-    const total = parts.reduce((acc, curr) => acc += curr.exercises, 0)
-
-    return (
-        <>
-            {part}
-            <h4>total of {total} exercises</h4>
-        </>
-    )
-}
-
-const Course = (props) => {
-    const { courses } = props;
-    const course = courses.map((course, i) => {
-        return (
-            <>
-                <Header title={course.name} />
-                <Content parts={course.parts} />
-            </>
-        )
-    })
-    return (
-        <>
-        {course}
-        </>
-    )
-}
+import Course from './components/Course'
 
 const App = () => {
     const course = [{
@@ -89,7 +45,13 @@ const App = () => {
     }
     ]
 
-    return <Course courses={course} />
+    return (
+        <>
+            <h1>Web development curriculum</h1>
+            <Course courses={course} />
+        </>
+    
+    )
 }
 
 export default App
