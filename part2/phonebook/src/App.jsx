@@ -53,6 +53,15 @@ const App = () => {
     }
   }
 
+  const handleDelete = (id) => {
+    if(window.confirm(`Delete ${persons.filter(p => p.id == id)[0].name} ?`)){
+      phoneService.deleteItem(id)
+        .then(deletedPerson => {
+          setPersons(persons.filter(p => p.id !== deletedPerson.id))
+        })
+    } 
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -66,7 +75,7 @@ const App = () => {
         addPerson={addPerson}
       />
       <h2>Numbers</h2>
-      <Persons people={personsToShow} />
+      <Persons people={personsToShow} handleDelete={handleDelete} />
     </div>
   )
 }
