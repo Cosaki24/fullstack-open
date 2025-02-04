@@ -3,12 +3,15 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import phoneService from './services/phonebook'
+import Message from './components/Message'
+import './styles.css'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [keyword, setKeyword] = useState('')
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
     phoneService.getAll()
@@ -47,6 +50,10 @@ const App = () => {
         phoneService.update(personToUpdate.id, person)
         .then(newDetails => {
           setPersons(persons.map(p => p.name === person.name ? newDetails : p))
+          setMessage(`Updated ${newDetails.name}`)
+          setTimeout(() => {
+            setMessage(null)
+          }, 2000)
           setNewName('')
           setNewNumber('')
         })
@@ -55,6 +62,10 @@ const App = () => {
       phoneService.create(person)
       .then(newContact => {
         setPersons(persons.concat(newContact))
+        setMessage(`Added ${newContact.name}`)
+        setTimeout(() => {
+          setMessage(null)
+        }, 2000)
         setNewName('')
         setNewNumber('')
       })  
@@ -73,6 +84,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Message message={message} />
       <Filter keyword={keyword} handleFilter={handleFilter} />
       <h3>Add a new</h3>
       <PersonForm 
