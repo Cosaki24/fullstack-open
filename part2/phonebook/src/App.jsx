@@ -5,6 +5,7 @@ import Persons from './components/Persons'
 import phoneService from './services/phonebook'
 import Message from './components/Message'
 import './styles.css'
+import ErrorMessage from './components/ErrorMessage'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -12,6 +13,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [keyword, setKeyword] = useState('')
   const [message, setMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
     phoneService.getAll()
@@ -57,6 +59,12 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
+        .catch(() => {
+          setErrorMessage(`Error: ${person.name} has already been removed from server`)
+          setTimeout(()=> {
+            setErrorMessage(null)
+          }, 2000)
+        })
       }
     } else {
       phoneService.create(person)
@@ -85,6 +93,7 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Message message={message} />
+      <ErrorMessage errorMessage={errorMessage} />
       <Filter keyword={keyword} handleFilter={handleFilter} />
       <h3>Add a new</h3>
       <PersonForm 
