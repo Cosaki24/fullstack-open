@@ -26,15 +26,19 @@ let phonebook = [
     }
 ]
 
+const generateId = () => {
+    return String(Math.floor(Math.random() * 1000))
+}
+
 app.get("/api/persons", (request, response) => {
     response.json(phonebook)
 })
 
-const info = `<p>Phonebook has info for ${phonebook.length} people</p>
+const getInfo = () => `<p>Phonebook has info for ${phonebook.length} people</p>
               <p>${new Date().toString("en-US")}`
 
 app.get("/info", (request, response) => {
-    response.send(info)
+    response.send(getInfo())
 })
 
 app.get("/api/persons/:id", (request, response) => {
@@ -48,6 +52,24 @@ app.get("/api/persons/:id", (request, response) => {
             })
     }
     response.json(person)
+})
+
+app.post("/api/persons", (request, response)=>{
+    const name = request.body.name
+    const number = request.body.number
+
+    const person = {
+        id: generateId(),
+        name: name,
+        number: number
+    }
+
+    phonebook = phonebook.concat(person)
+
+    response.status(201).json({
+        message: 'entry added',
+        contact: person
+    })
 })
 
 app.delete("/api/persons/:id", (request, response) => {
