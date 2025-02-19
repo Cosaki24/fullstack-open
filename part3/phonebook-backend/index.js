@@ -3,7 +3,10 @@ var morgan = require('morgan')
 const PORT = 3001
 const app = express()
 app.use(express.json())
-app.use(morgan('tiny'))
+
+morgan.token('request-body', (request, response) => JSON.stringify(request.body))
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :request-body'))
 
 let phonebook = [
     {
