@@ -3,7 +3,7 @@ const PORT = 3001
 const app = express()
 app.use(express.json())
 
-const phonebook = [
+let phonebook = [
     {
         "id": "1",
         "name": "Arto Hellas",
@@ -31,7 +31,7 @@ app.get("/api/persons", (request, response) => {
 })
 
 const info = `<p>Phonebook has info for ${phonebook.length} people</p>
-              <p>${new Date().toString("en-TZ")}`
+              <p>${new Date().toString("en-US")}`
 
 app.get("/info", (request, response) => {
     response.send(info)
@@ -48,6 +48,16 @@ app.get("/api/persons/:id", (request, response) => {
             })
     }
     response.json(person)
+})
+
+app.delete("/api/persons/:id", (request, response) => {
+    const id = request.params.id
+    const prevCount = phonebook.length
+    phonebook = phonebook.filter(p => p.id !== id)
+    
+    response.status(200).json({
+        message: `Deleted ${prevCount - phonebook.length} contact(s)`
+    })
 })
 
 app.listen(PORT, () => {
