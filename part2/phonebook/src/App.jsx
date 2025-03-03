@@ -51,8 +51,8 @@ const App = () => {
         const personToUpdate = persons.find(p => p.name === person.name )
         phoneService.update(personToUpdate.id, person)
         .then(newDetails => {
-          setPersons(persons.map(p => p.name === person.name ? newDetails : p))
-          setMessage(`Updated ${newDetails.name}`)
+          setPersons(persons.map(p => p.name === person.name ? newDetails.contact : p))
+          setMessage(`Updated ${newDetails.contact.name}`)
           setTimeout(() => {
             setMessage(null)
           }, 2000)
@@ -69,8 +69,8 @@ const App = () => {
     } else {
       phoneService.create(person)
       .then(newContact => {
-        setPersons(persons.concat(newContact))
-        setMessage(`Added ${newContact.name}`)
+        setPersons(persons.concat(newContact.contact))
+        setMessage(`Added ${newContact.contact.name}`)
         setTimeout(() => {
           setMessage(null)
         }, 2000)
@@ -83,8 +83,8 @@ const App = () => {
   const handleDelete = (id) => {
     if(window.confirm(`Delete ${persons.filter(p => p.id == id)[0].name} ?`)){
       phoneService.deleteItem(id)
-        .then(deletedPerson => {
-          setPersons(persons.filter(p => p.id !== deletedPerson.id))
+        .then(() => {
+          setPersons(persons.filter(p => p.id !== id))
         })
     } 
   }
