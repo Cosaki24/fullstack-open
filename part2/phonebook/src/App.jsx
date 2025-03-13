@@ -51,11 +51,11 @@ const App = () => {
         const personToUpdate = persons.find(p => p.name === person.name )
         phoneService.update(personToUpdate.id, person)
         .then(newDetails => {
-          setPersons(persons.map(p => p.name === person.name ? newDetails.contact : p))
-          setMessage(`Updated ${newDetails.contact.name}`)
+          setPersons(persons.map(p => p.name === person.name ? newDetails : p))
+          setMessage(`Updated ${newDetails.name}`)
           setTimeout(() => {
             setMessage(null)
-          }, 2000)
+          }, 5000)
           setNewName('')
           setNewNumber('')
         })
@@ -63,7 +63,7 @@ const App = () => {
           setErrorMessage(`Error: ${person.name} has already been removed from server`)
           setTimeout(()=> {
             setErrorMessage(null)
-          }, 2000)
+          }, 5000)
         })
       }
     } else {
@@ -73,7 +73,7 @@ const App = () => {
         setMessage(`Added ${newContact.contact.name}`)
         setTimeout(() => {
           setMessage(null)
-        }, 2000)
+        }, 5000)
         setNewName('')
         setNewNumber('')
       })  

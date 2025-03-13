@@ -59,12 +59,6 @@ app.post("/api/persons", (request, response, next)=>{
         
     }
 
-    // if(phonebook.some(person => person.name === name)){
-    //     return response.status(409).json({
-    //         error: `entry with name '${name}' already exists`
-    //     })
-    // }
-
     const person = new Contact({
         name: name,
         number: number
@@ -76,6 +70,26 @@ app.post("/api/persons", (request, response, next)=>{
             contact: result
         })
     }).catch(error => next(error))
+})
+
+app.put("/api/persons/:id", (request, response, next) => {
+    const id = request.params.id
+    const body = request.body
+
+    const person = {
+        name: body.name,
+        number: body.number
+    }
+
+    Contact.findByIdAndUpdate(id, body, {new: true})
+        .then(result => {
+            if(result){
+                response.json(result)
+            }else{
+                response.status(404).send({'error': 'No contact was updated'})
+            }
+        })
+        .catch(error => next(error))
 })
 
 app.delete("/api/persons/:id", (request, response, next) => {
