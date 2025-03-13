@@ -11,32 +11,6 @@ morgan.token('request-body', (request, response) => JSON.stringify(request.body)
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :request-body'))
 
-// let phonebook = [
-//     {
-//         "id": "1",
-//         "name": "Arto Hellas",
-//         "number": "040-123456"
-//     },
-//     {
-//         "id": "2",
-//         "name": "Ada Lovelace",
-//         "number": "39-44-5323523"
-//     },
-//     {
-//         "id": "3",
-//         "name": "Dan Abramov",
-//         "number": "12-43-234345"
-//     },
-//     {
-//         "id": "4",
-//         "name": "Mary Poppendieck",
-//         "number": "39-23-6423122"
-//     }
-// ]
-
-// const generateId = () => {
-//     return String(Math.floor(Math.random() * 1000))
-// }
 
 app.get("/api/persons", (request, response) => {
     Contact.find({}).then(people => {
@@ -108,15 +82,21 @@ app.post("/api/persons", (request, response)=>{
     })
 })
 
-// app.delete("/api/persons/:id", (request, response) => {
-//     const id = request.params.id
-//     const prevCount = phonebook.length
-//     phonebook = phonebook.filter(p => p.id !== id)
-    
-//     response.status(200).json({
-//         message: `Deleted ${prevCount - phonebook.length} contact(s)`
-//     })
-// })
+app.delete("/api/persons/:id", (request, response) => {
+    const id = request.params.id
+    Contact.findByIdAndDelete(id)
+    .then(result => {
+        if(result){
+            response.status(200).json({message: `${result.name} has been deleted`})
+        }else{
+            response.status(204).end()
+        }
+    })
+    .catch(error => {
+        console.log(error)
+        response.status(400).json({error: 'bad id'})
+    })
+})
 
 
 const PORT = process.env.PORT || 3001
