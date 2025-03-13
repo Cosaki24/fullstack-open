@@ -12,19 +12,19 @@ morgan.token('request-body', (request, response) => JSON.stringify(request.body)
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :request-body'))
 
 
-app.get("/api/persons", (request, response, error) => {
+app.get("/api/persons", (request, response, next) => {
     Contact.find({}).then(people => {
         response.json(people)
     }).catch(error => next(error))
 })
 
-const getInfo = (array) => `<p>Phonebook has info for ${array.length} people</p>
+const getInfo = (number) => `<p>Phonebook has info for ${number} people</p>
               <p>${new Date().toString("en-US")}`
 
-app.get("/info", (request, response) => {
-    Contact.find({}).then(people => {
-        response.send(getInfo(people))
-    })
+app.get("/info", (request, response, next) => {
+    Contact.estimatedDocumentCount().then(count => {
+        response.send(getInfo(count))
+    }).catch(error => next(error))
 })
 
 app.get("/api/persons/:id", (request, response, next) => {

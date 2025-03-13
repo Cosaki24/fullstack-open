@@ -83,8 +83,14 @@ const App = () => {
   const handleDelete = (id) => {
     if(window.confirm(`Delete ${persons.filter(p => p.id == id)[0].name} ?`)){
       phoneService.deleteItem(id)
-        .then(() => {
+        .then((result) => {
           setPersons(persons.filter(p => p.id !== id))
+          if(result.message){
+            setMessage(result.message)
+            setTimeout(() => {
+              setMessage(null)
+            }, 5000)
+          }         
         })
     } 
   }
