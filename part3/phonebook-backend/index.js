@@ -1,4 +1,4 @@
-require('dotenv').config()
+//require('dotenv').config()
 const express = require('express')
 var morgan = require('morgan')
 const cors = require('cors')
