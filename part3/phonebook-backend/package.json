@@ -10,13 +10,20 @@
     "build:ui": "erase dist && cd ..\\..\\part2\\phonebook\\ && npm run build && xcopy dist ..\\..\\part3\\phonebook-backend\\dist\\ /s",
     "deploy": "fly deploy",
     "deploy:full": "npm run build:ui && npm run deploy",
-    "logs:prod": "fly logs"
+    "logs:prod": "fly logs",
+    "lint": "eslint ."
   },
   "author": "Collins Kipepe",
   "license": "ISC",
   "devDependencies": {
+    "@eslint/js": "^9.22.0",
     "@flydotio/dockerfile": "^0.7.8",
-    "nodemon": "^3.1.9"
+    "@stylistic/eslint-plugin-js": "^4.2.0",
+    "eslint": "^9.22.0",
+    "globals": "^16.0.0",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.5.3",
+    "prettier-eslint": "^16.3.0"
   },
   "dependencies": {
     "cors": "^2.8.5",
