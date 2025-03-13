@@ -74,14 +74,10 @@ app.post("/api/persons", (request, response, next)=>{
 
 app.put("/api/persons/:id", (request, response, next) => {
     const id = request.params.id
-    const body = request.body
+    const {name, number} = request.body
 
-    const person = {
-        name: body.name,
-        number: body.number
-    }
 
-    Contact.findByIdAndUpdate(id, body, {new: true})
+    Contact.findByIdAndUpdate(id, {name, number}, {new: true, runValidators: true, context: 'query'})
         .then(result => {
             if(result){
                 response.json(result)
@@ -116,6 +112,8 @@ const errorHandler = (error, request, response, next) => {
 
     if(error.name === 'CastError'){
         return response.status(400).send({error: 'bad id'})
+    }else if(error.name === 'ValidationError'){
+        return response.status(400).json({error: error.message})
     }
 
     next(error)

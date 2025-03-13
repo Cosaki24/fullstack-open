@@ -59,8 +59,12 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
-        .catch(() => {
-          setErrorMessage(`Error: ${person.name} has already been removed from server`)
+        .catch((error) => {
+          if(error.response.status === 404){
+            setErrorMessage(`Error: ${person.name} has already been removed from server`)
+          }else{
+            setErrorMessage(error.response.data.error)
+          }       
           setTimeout(()=> {
             setErrorMessage(null)
           }, 5000)
@@ -76,6 +80,12 @@ const App = () => {
         }, 5000)
         setNewName('')
         setNewNumber('')
+      })
+      .catch(error => {
+        setErrorMessage(error.response.data.error)
+        setTimeout(()=>{
+          setErrorMessage(null)
+        }, 5000)
       })  
     }
   }

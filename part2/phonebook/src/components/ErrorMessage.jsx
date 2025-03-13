@@ -2,7 +2,7 @@ const ErrorMessage = ({errorMessage}) => {
     const style = {
         color: "white",
         backgroundColor: "red",
-        maxWidth: "200px",
+        maxWidth: "500px",
         border: 0
     }
 
