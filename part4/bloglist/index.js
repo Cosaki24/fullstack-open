@@ -2,10 +2,10 @@ const express = require('express')
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 const config = require('./utils/config')
-const Blog = require('./models/blog')
 const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
+const blogRouter = require('./controllers/blog')
 
 mongoose.set('strictQuery', false)
 
@@ -23,22 +23,9 @@ mongoose
 app.use(cors())
 app.use(express.json())
 app.use(middleware.requestLogger)
+app.use('/api/blogs', blogRouter)
 
-app.get('/api/blogs', (request, response) => {
-	Blog.find({}).then((blogs) => {
-		response.json(blogs)
-	})
-})
 
-app.post('/api/blogs', (request, response) => {
-	const blog = new Blog(request.body)
-
-	blog.save().then((result) => {
-		response.status(201).json(result)
-	})
-})
-
-const PORT = config.PORT
 app.listen(PORT, () => {
-	logger.info(`Server running on port ${PORT}`)
+	logger.info(`Server running on port ${config.PORT}`)
 })
