@@ -37,6 +37,11 @@ const listWithManyBlogs = [
 	},
 ]
 
+const authorWithMostBlogs = {
+	author: 'Robert C. Martin',
+	blogs: 2,
+}
+
 const blogWithMostLikes = {
 	title: 'How to turn off website notifications in Chrome for Android for good',
 	author: 'Tamas Baka',
@@ -72,5 +77,12 @@ describe('favoriteBlog', () => {
 	test('is the blog which has most likes', () => {
 		const result = listHelper.favoriteBlog(listWithManyBlogs)
 		assert.deepStrictEqual(result, blogWithMostLikes)
+	})
+})
+
+describe('mostBlogs', () => {
+	test('returns the author with most blogs and blog count', () => {
+		const result = listHelper.mostBlogs(listWithManyBlogs)
+		assert.deepStrictEqual(result, authorWithMostBlogs)
 	})
 })
