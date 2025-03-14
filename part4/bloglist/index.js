@@ -2,34 +2,22 @@ const express = require('express')
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 const config = require('./utils/config')
+const Blog = require('./models/blog')
 const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
 
-const blogSchema = new mongoose.Schema({
-	title: String,
-	author: String,
-	url: String,
-	likes: Number,
-})
+mongoose.set('strictQuery', false)
 
-blogSchema.set('toJSON', {
-	transform: (document, returnedObject) => {
-		returnedObject.id = returnedObject._id.toString()
-		delete returnedObject._id
-		delete returnedObject.__v
-	},
-})
-
-const Blog = mongoose.model('Blog', blogSchema)
 logger.info('Connecting to MongoDB...')
+
 mongoose
 	.connect(config.MONGODB_URL)
 	.then(() => {
-		logger.info('Connected')
+		logger.info('Connected to MongoDB')
 	})
 	.catch((error) => {
-		logger.error(error)
+		logger.error('Error connection to mongoDB: ', error.message)
 	})
 
 app.use(cors())
