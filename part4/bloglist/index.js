@@ -1,11 +1,10 @@
 const express = require('express')
-const morgan = require('morgan')
+const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 const config = require('./utils/config')
 const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
-morgan.token('request-body', (request) => JSON.stringify(request.body))
 
 const blogSchema = new mongoose.Schema({
 	title: String,
@@ -35,11 +34,7 @@ mongoose
 
 app.use(cors())
 app.use(express.json())
-app.use(
-	morgan(
-		':method :url :status :res[content-length] - :response-time ms :request-body'
-	)
-)
+app.use(middleware.requestLogger)
 
 app.get('/api/blogs', (request, response) => {
 	Blog.find({}).then((blogs) => {
