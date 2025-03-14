@@ -38,9 +38,32 @@ const mostBlogs = (blogs) => {
 	return authorWithMostBlog
 }
 
+const mostLikes = (blogs) => {
+	// assumption is that we are accumulating likes from all blogs rather than which blog has the most likes
+	const findAuthorLikesCount = (arr, blog) => {
+		const authorItem = arr.find((item) => item.author === blog.author)
+
+		if (authorItem) {
+			authorItem.likes += blog.likes
+		} else {
+			arr.push({ author: blog.author, likes: blog.likes })
+		}
+
+		return arr
+	}
+
+	const authorLikesCountArr = blogs.reduce(findAuthorLikesCount, [])
+	const authorWithMostLikes = authorLikesCountArr.reduce((max, curr) => {
+		return curr.likes > max.likes ? curr : max
+	})
+
+	return authorWithMostLikes
+}
+
 module.exports = {
 	dummy,
 	totalLikes,
 	favoriteBlog,
 	mostBlogs,
+	mostLikes,
 }

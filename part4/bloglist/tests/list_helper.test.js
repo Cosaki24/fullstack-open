@@ -17,7 +17,7 @@ const listWithManyBlogs = [
 		title: 'Does organization matter?',
 		author: 'Robert C. Martin',
 		url: 'https://blog.cleancoder.com/uncle-bob/2015/04/15/DoesOrganizationMatter.html',
-		likes: 6,
+		likes: 60,
 		id: '67d409dc93533fdb1bda112b',
 	},
 	{
@@ -40,6 +40,11 @@ const listWithManyBlogs = [
 const authorWithMostBlogs = {
 	author: 'Robert C. Martin',
 	blogs: 2,
+}
+
+const AuthorWithMostLikes = {
+	author: 'Robert C. Martin',
+	likes: 110,
 }
 
 const blogWithMostLikes = {
@@ -69,7 +74,7 @@ describe('totalLikes', () => {
 
 	test('of a bigger list is calculated right', () => {
 		const result = listHelper.totalLikes(listWithManyBlogs)
-		assert.strictEqual(result, 156)
+		assert.strictEqual(result, 210)
 	})
 })
 
@@ -84,5 +89,12 @@ describe('mostBlogs', () => {
 	test('returns the author with most blogs and blog count', () => {
 		const result = listHelper.mostBlogs(listWithManyBlogs)
 		assert.deepStrictEqual(result, authorWithMostBlogs)
+	})
+})
+
+describe('mostLikes', () => {
+	test('returns author with the most likes from the list of blogs', () => {
+		const result = listHelper.mostLikes(listWithManyBlogs)
+		assert.deepStrictEqual(result, AuthorWithMostLikes)
 	})
 })
