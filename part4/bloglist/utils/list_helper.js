@@ -1,6 +1,4 @@
-const dummy = (blogs) => {
-	return 1
-}
+const dummy = (blogs) => (blogs ? 1 : 1)
 
 const totalLikes = (blogs) => {
 	const sumOfLikes = (sum, blog) => {
