@@ -54,6 +54,11 @@ test.only('api returns a note with 60 likes', async () => {
 	assert.strictEqual(response.body[0].likes, 60)
 })
 
+test.only('api returns an object with unique identifier property \'id\'', async () => {
+	const response = await api.get('/api/blogs')
+	assert(response.body[0].id)
+})
+
 after(async () => {
 	await mongoose.connection.close()
 })
