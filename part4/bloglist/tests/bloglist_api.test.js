@@ -1,4 +1,4 @@
-const { test, after, beforeEach } = require('node:test')
+const { describe, test, after, beforeEach } = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
 const app = require('../app')
@@ -48,80 +48,93 @@ const testBlogs = [
 	},
 ]
 
-beforeEach(async () => {
-	await Blog.deleteMany({})
-	let blogObject = new Blog(testBlogs[0])
-	await blogObject.save()
-})
+describe('When only a single blog with 60 likes exists', async () => {
+	beforeEach(async () => {
+		await Blog.deleteMany({})
+		let blogObject = new Blog(testBlogs[0])
+		await blogObject.save()
+	})
 
-test.only('api returns json response', async () => {
-	await api.get('/api/blogs/').expect(200).expect('Content-Type', /json/)
-})
+	test.only('api returns json response', async () => {
+		await api.get('/api/blogs/').expect(200).expect('Content-Type', /json/)
+	})
 
-test.only('api returns one note', async () => {
-	const response = await api.get('/api/blogs/')
+	test.only('api returns one blog', async () => {
+		const response = await api.get('/api/blogs/')
 
-	assert.strictEqual(response.body.length, 1)
-})
+		assert.strictEqual(response.body.length, 1)
+	})
 
-test.only('api returns a note with 60 likes', async () => {
-	const response = await api.get('/api/blogs/')
+	test.only('api returns a blog with 60 likes', async () => {
+		const response = await api.get('/api/blogs/')
 
-	assert.strictEqual(response.body[0].likes, 60)
-})
+		assert.strictEqual(response.body[0].likes, 60)
+	})
 
-test.only('api returns an object with unique identifier property \'id\'', async () => {
-	const response = await api.get('/api/blogs')
-	assert(response.body[0].id)
-})
+	test.only('api returns a blog object with unique identifier property "id"', async () => {
+		const response = await api.get('/api/blogs')
+		assert(response.body[0].id)
+	})
 
-test.only('api can add one blog into the database', async () => {
-	await api
-		.post('/api/blogs/')
-		.send(testBlogs[1])
-		.expect(201)
-		.expect('Content-Type', /json/)
+	describe('to insert', async () => {
+		test.only('api can add one blog into the database', async () => {
+			await api
+				.post('/api/blogs/')
+				.send(testBlogs[1])
+				.expect(201)
+				.expect('Content-Type', /json/)
 
-	const response = await api.get('/api/blogs/')
-	const blogTitles = response.body.map((t) => t.title)
+			const response = await api.get('/api/blogs/')
+			const blogTitles = response.body.map((t) => t.title)
 
-	assert.strictEqual(response.body.length, 2)
-	assert(blogTitles.includes(testBlogs[1].title))
-})
+			assert.strictEqual(response.body.length, 2)
+			assert(blogTitles.includes(testBlogs[1].title))
+		})
 
-test.only('blog without likes returns zero likes', async () => {
-	await api
-		.post('/api/blogs/')
-		.send(testBlogs[3])
-		.expect(201)
-		.expect('Content-Type', /json/)
+		test.only('blog without likes returns zero likes', async () => {
+			await api
+				.post('/api/blogs/')
+				.send(testBlogs[3])
+				.expect(201)
+				.expect('Content-Type', /json/)
 
-	const response = await api.get('/api/blogs/')
-	const blogWithZeroLikes = response.body.find(
-		(bz) => bz.title === 'All you may need is HTML'
-	)
-	assert(Object.prototype.hasOwnProperty.call(blogWithZeroLikes, 'likes'))
-	assert.strictEqual(blogWithZeroLikes.likes, 0)
-})
+			const response = await api.get('/api/blogs/')
+			const blogWithZeroLikes = response.body.find(
+				(bz) => bz.title === 'All you may need is HTML'
+			)
+			assert(Object.prototype.hasOwnProperty.call(blogWithZeroLikes, 'likes'))
+			assert.strictEqual(blogWithZeroLikes.likes, 0)
+		})
 
-test.only('blog without title returns 400BadRequest', async () => {
-	const response = await api.post('/api/blogs/').send(testBlogs[4]).expect(400)
-	assert(response.body.error.includes('title is required'))
-})
+		test.only('blog without title returns 400BadRequest', async () => {
+			const response = await api
+				.post('/api/blogs/')
+				.send(testBlogs[4])
+				.expect(400)
+			assert(response.body.error.includes('title is required'))
+		})
 
-test.only('blog without url returns 400BadRequest', async () => {
-	const response = await api.post('/api/blogs/').send(testBlogs[5]).expect(400)
-	assert(response.body.error.includes('url is required'))
-})
+		test.only('blog without url returns 400BadRequest', async () => {
+			const response = await api
+				.post('/api/blogs/')
+				.send(testBlogs[5])
+				.expect(400)
+			assert(response.body.error.includes('url is required'))
+		})
 
-test.only('blog with no url and author returns 400BadRequest', async () => {
-	const response = await api.post('/api/blogs/').send(testBlogs[6]).expect(400)
-	assert(
-		response.body.error.includes('url is required') &&
-			response.body.error.includes('title is required')
-	)
-})
+		test.only('blog with no url and author returns 400BadRequest', async () => {
+			const response = await api
+				.post('/api/blogs/')
+				.send(testBlogs[6])
+				.expect(400)
+			assert(
+				response.body.error.includes('url is required') &&
+					response.body.error.includes('title is required')
+			)
+		})
 
-after(async () => {
-	await mongoose.connection.close()
+		after(async () => {
+			await mongoose.connection.close()
+		})
+	})
 })
