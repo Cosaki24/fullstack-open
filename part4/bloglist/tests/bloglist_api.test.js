@@ -13,14 +13,14 @@ const testBlogs = [
 		author: 'Robert C. Martin',
 		url: 'https://blog.cleancoder.com/uncle-bob/2015/04/15/DoesOrganizationMatter.html',
 		likes: 60,
-		id: '67d409dc93533fdb1bda112b',
+		_id: '67d409dc93533fdb1bda112b',
 	},
 	{
 		title: 'Tools are not the answer',
 		author: 'Robert C. Martin',
 		url: 'https://blog.cleancoder.com/uncle-bob/2017/10/04/CodeIsNotTheAnswer.html',
 		likes: 50,
-		id: '67d416deca25a12448908791',
+		_id: '67d416deca25a12448908791',
 	},
 	{
 		title:
@@ -28,7 +28,7 @@ const testBlogs = [
 		author: 'Tamas Baka',
 		url: 'https://randomblog.hu/how-to-turn-off-website-notifications-in-chrome-on-android-for-good/',
 		likes: 100,
-		id: '67d41ea7f6697e92337c4f3f',
+		_id: '67d41ea7f6697e92337c4f3f',
 	},
 	{
 		title: 'All you may need is HTML',
@@ -132,9 +132,30 @@ describe('When only a single blog with 60 likes exists', async () => {
 					response.body.error.includes('title is required')
 			)
 		})
+	})
 
-		after(async () => {
-			await mongoose.connection.close()
+	describe('to delete a blog', async () => {
+		test.only('returns successfully deleted', async () => {
+			const blogTodelete = testBlogs[0]._id
+			const response = await api.delete(`/api/blogs/${blogTodelete}`).expect(200)
+			assert(Object.prototype.hasOwnProperty.call(response.body, 'message'))
+			assert.strictEqual(`a blog with id ${blogTodelete} has been deleted`, response.body.message)
 		})
+
+		test.only('with a bad id returns 400BadRequest', async () => {
+			const badId = '1234shsioeerq'
+			const response = await api.delete(`/api/blogs/${badId}`).expect(400)
+			assert(Object.prototype.hasOwnProperty.call(response.body, 'error'))
+			assert(response.body.error.includes('bad id'))
+		})
+
+		test.only('which doesnt exist returns 204NoContent', async () => {
+			const nonexistentId = '67d41ea7f6697e92337c4f3f'
+			await api.delete(`/api/blogs/${nonexistentId}`).expect(204)
+		})
+	})
+
+	after(async () => {
+		await mongoose.connection.close()
 	})
 })
