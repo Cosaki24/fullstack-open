@@ -9,20 +9,31 @@ const blogRouter = require('./controllers/blog')
 
 mongoose.set('strictQuery', false)
 
-logger.info('Connecting to MongoDB...')
+const startServer = async () => {
+	const MONGODB_URL = await config.loadDbConfig()
 
-mongoose
-	.connect(config.MONGODB_URL)
-	.then(() => {
-		logger.info('Connected to MongoDB')
-	})
-	.catch((error) => {
-		logger.error('Error connection to mongoDB: ', error.message)
-	})
+	if (MONGODB_URL) {
+		logger.info(`Connecting to MongoDB at ${MONGODB_URL}`)
 
-app.use(cors())
-app.use(express.json())
-app.use(middleware.requestLogger)
-app.use('/api/blogs', blogRouter)
+		mongoose
+			.connect(MONGODB_URL)
+			.then(() => {
+				logger.info(`Connected to MongoDB at ${MONGODB_URL}`)
+			})
+			.catch((error) => {
+				logger.error('Error connection to mongoDB: ', error.message)
+			})
+
+		app.use(cors())
+		app.use(express.json())
+		app.use(middleware.requestLogger)
+		app.use('/api/blogs', blogRouter)
+	}
+}
+
+startServer().catch((error) => {
+	logger.error('Unable to start server due to error: ', error)
+	process.exit(1)
+})
 
 module.exports = app

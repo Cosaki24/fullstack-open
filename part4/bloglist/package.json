@@ -4,10 +4,10 @@
   "description": "The blog list application allows user to save information about intersting blogs they have stumbled across the internet.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
     "lint": "eslint .",
-    "test": "node --test"
+    "test": "cross-env NODE_ENV=test node --test"
   },
   "author": "Collins Kipepe",
   "license": "ISC",
@@ -21,8 +21,11 @@
   "devDependencies": {
     "@eslint/js": "^9.22.0",
     "@stylistic/eslint-plugin-js": "^4.2.0",
+    "cross-env": "^7.0.3",
     "eslint": "^9.22.0",
     "globals": "^16.0.0",
-    "nodemon": "^3.1.9"
+    "mongodb-memory-server": "^10.1.4",
+    "nodemon": "^3.1.9",
+    "supertest": "^7.0.0"
   }
 }
