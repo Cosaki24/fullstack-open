@@ -59,6 +59,16 @@ test.only('api returns an object with unique identifier property \'id\'', async 
 	assert(response.body[0].id)
 })
 
+test.only('api can add one blog into the database', async () => {
+	await api.post('/api/blogs/').send(testBlogs[1]).expect(201).expect('Content-Type', /json/)
+
+	const response = await api.get('/api/blogs/')
+	const blogTitles = response.body.map(t => t.title)
+
+	assert.strictEqual(response.body.length, 2)
+	assert(blogTitles.includes(testBlogs[1].title))
+})
+
 after(async () => {
 	await mongoose.connection.close()
 })
