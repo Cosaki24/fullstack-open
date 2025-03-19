@@ -33,19 +33,19 @@ const testBlogs = [
 	{
 		title: 'All you may need is HTML',
 		author: 'Fabien Sanglard',
-		url: 'https://fabiensanglard.net/html/index.html'
+		url: 'https://fabiensanglard.net/html/index.html',
 	},
 	{
 		author: 'Kent Beck',
-		url: 'https://kentBenk.dev/blogwithouttitledoesntexist'
+		url: 'https://kentBenk.dev/blogwithouttitledoesntexist',
 	},
 	{
 		title: 'A blog with no url',
-		author: 'Anonymous'
+		author: 'Anonymous',
 	},
 	{
-		author: 'Not a Writer'
-	}
+		author: 'Not a Writer',
+	},
 ]
 
 beforeEach(async () => {
@@ -76,34 +76,50 @@ test.only('api returns an object with unique identifier property \'id\'', async 
 })
 
 test.only('api can add one blog into the database', async () => {
-	await api.post('/api/blogs/').send(testBlogs[1]).expect(201).expect('Content-Type', /json/)
+	await api
+		.post('/api/blogs/')
+		.send(testBlogs[1])
+		.expect(201)
+		.expect('Content-Type', /json/)
 
 	const response = await api.get('/api/blogs/')
-	const blogTitles = response.body.map(t => t.title)
+	const blogTitles = response.body.map((t) => t.title)
 
 	assert.strictEqual(response.body.length, 2)
 	assert(blogTitles.includes(testBlogs[1].title))
 })
 
 test.only('blog without likes returns zero likes', async () => {
-	await api.post('/api/blogs/').send(testBlogs[3]).expect(201).expect('Content-Type', /json/)
+	await api
+		.post('/api/blogs/')
+		.send(testBlogs[3])
+		.expect(201)
+		.expect('Content-Type', /json/)
 
 	const response = await api.get('/api/blogs/')
-	const blogWithZeroLikes = response.body.find(bz => bz.title === 'All you may need is HTML' )
+	const blogWithZeroLikes = response.body.find(
+		(bz) => bz.title === 'All you may need is HTML'
+	)
 	assert(Object.prototype.hasOwnProperty.call(blogWithZeroLikes, 'likes'))
 	assert.strictEqual(blogWithZeroLikes.likes, 0)
 })
 
 test.only('blog without title returns 400BadRequest', async () => {
-	await api.post('/api/blogs/').send(testBlogs[4]).expect(400)
+	const response = await api.post('/api/blogs/').send(testBlogs[4]).expect(400)
+	assert(response.body.error.includes('title is required'))
 })
 
 test.only('blog without url returns 400BadRequest', async () => {
-	await api.post('/api/blogs/').send(testBlogs[5]).expect(400)
+	const response = await api.post('/api/blogs/').send(testBlogs[5]).expect(400)
+	assert(response.body.error.includes('url is required'))
 })
 
 test.only('blog with no url and author returns 400BadRequest', async () => {
-	await api.post('/api/blogs/').send(testBlogs[6]).expect(400)
+	const response = await api.post('/api/blogs/').send(testBlogs[6]).expect(400)
+	assert(
+		response.body.error.includes('url is required') &&
+			response.body.error.includes('title is required')
+	)
 })
 
 after(async () => {
