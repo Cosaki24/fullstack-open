@@ -34,6 +34,17 @@ const testBlogs = [
 		title: 'All you may need is HTML',
 		author: 'Fabien Sanglard',
 		url: 'https://fabiensanglard.net/html/index.html'
+	},
+	{
+		author: 'Kent Beck',
+		url: 'https://kentBenk.dev/blogwithouttitledoesntexist'
+	},
+	{
+		title: 'A blog with no url',
+		author: 'Anonymous'
+	},
+	{
+		author: 'Not a Writer'
 	}
 ]
 
@@ -81,6 +92,18 @@ test.only('blog without likes returns zero likes', async () => {
 	const blogWithZeroLikes = response.body.find(bz => bz.title === 'All you may need is HTML' )
 	assert(Object.prototype.hasOwnProperty.call(blogWithZeroLikes, 'likes'))
 	assert.strictEqual(blogWithZeroLikes.likes, 0)
+})
+
+test.only('blog without title returns 400BadRequest', async () => {
+	await api.post('/api/blogs/').send(testBlogs[4]).expect(400)
+})
+
+test.only('blog without url returns 400BadRequest', async () => {
+	await api.post('/api/blogs/').send(testBlogs[5]).expect(400)
+})
+
+test.only('blog with no url and author returns 400BadRequest', async () => {
+	await api.post('/api/blogs/').send(testBlogs[6]).expect(400)
 })
 
 after(async () => {
