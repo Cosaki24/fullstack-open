@@ -30,6 +30,11 @@ const testBlogs = [
 		likes: 100,
 		id: '67d41ea7f6697e92337c4f3f',
 	},
+	{
+		title: 'All you may need is HTML',
+		author: 'Fabien Sanglard',
+		url: 'https://fabiensanglard.net/html/index.html'
+	}
 ]
 
 beforeEach(async () => {
@@ -67,6 +72,15 @@ test.only('api can add one blog into the database', async () => {
 
 	assert.strictEqual(response.body.length, 2)
 	assert(blogTitles.includes(testBlogs[1].title))
+})
+
+test.only('blog without likes returns zero likes', async () => {
+	await api.post('/api/blogs/').send(testBlogs[3]).expect(201).expect('Content-Type', /json/)
+
+	const response = await api.get('/api/blogs/')
+	const blogWithZeroLikes = response.body.find(bz => bz.title === 'All you may need is HTML' )
+	assert(Object.prototype.hasOwnProperty.call(blogWithZeroLikes, 'likes'))
+	assert.strictEqual(blogWithZeroLikes.likes, 0)
 })
 
 after(async () => {
