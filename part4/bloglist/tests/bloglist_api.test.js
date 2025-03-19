@@ -7,7 +7,7 @@ const Blog = require('../models/blog')
 
 const api = supertest(app)
 
-const testBlogs = [
+let testBlogs = [
 	{
 		title: 'Does organization matter?',
 		author: 'Robert C. Martin',
@@ -152,6 +152,24 @@ describe('When only a single blog with 60 likes exists', async () => {
 		test.only('which doesnt exist returns 204NoContent', async () => {
 			const nonexistentId = '67d41ea7f6697e92337c4f3f'
 			await api.delete(`/api/blogs/${nonexistentId}`).expect(204)
+		})
+	})
+
+	describe('to update a blog', async () => {
+		test.only('with new number of likes returns correct likes', async () => {
+			const blogToUpdate = testBlogs[0]._id
+			const newLikes = 400
+			testBlogs[0].likes = newLikes
+			const response = await api.put(`/api/blogs/${blogToUpdate}`).send(testBlogs[0]).expect(200)
+			assert.strictEqual(response.body.likes, newLikes)
+		})
+
+		test.only('without title or url throws validation error', async () => {
+			const blogToUpdate = testBlogs[0]._id
+			const randomNumber = Math.floor(Math.random() * 10)
+			randomNumber % 2 === 0 ? testBlogs[0].title = null : testBlogs[0].url = null
+			const response = await api.put(`/api/blogs/${blogToUpdate}`).send(testBlogs[0]).expect(400)
+			assert.strictEqual(response.body.error, 'title or url is missing')
 		})
 	})
 
