@@ -6,7 +6,7 @@ const PORT = process.env.PORT
 let db
 
 const initializeDB = async () => {
-	if (process.env.NODE_ENV === 'test') {
+	if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
 		try {
 			db = new mongoClient.MongoMemoryServer({
 				instance: {

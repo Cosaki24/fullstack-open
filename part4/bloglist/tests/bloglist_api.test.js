@@ -55,29 +55,29 @@ describe('When only a single blog with 60 likes exists', async () => {
 		await blogObject.save()
 	})
 
-	test.only('api returns json response', async () => {
+	test('api returns json response', async () => {
 		await api.get('/api/blogs/').expect(200).expect('Content-Type', /json/)
 	})
 
-	test.only('api returns one blog', async () => {
+	test('api returns one blog', async () => {
 		const response = await api.get('/api/blogs/')
 
 		assert.strictEqual(response.body.length, 1)
 	})
 
-	test.only('api returns a blog with 60 likes', async () => {
+	test('api returns a blog with 60 likes', async () => {
 		const response = await api.get('/api/blogs/')
 
 		assert.strictEqual(response.body[0].likes, 60)
 	})
 
-	test.only('api returns a blog object with unique identifier property "id"', async () => {
+	test('api returns a blog object with unique identifier property "id"', async () => {
 		const response = await api.get('/api/blogs')
 		assert(response.body[0].id)
 	})
 
 	describe('to insert', async () => {
-		test.only('api can add one blog into the database', async () => {
+		test('api can add one blog into the database', async () => {
 			await api
 				.post('/api/blogs/')
 				.send(testBlogs[1])
@@ -91,7 +91,7 @@ describe('When only a single blog with 60 likes exists', async () => {
 			assert(blogTitles.includes(testBlogs[1].title))
 		})
 
-		test.only('blog without likes returns zero likes', async () => {
+		test('blog without likes returns zero likes', async () => {
 			await api
 				.post('/api/blogs/')
 				.send(testBlogs[3])
@@ -106,7 +106,7 @@ describe('When only a single blog with 60 likes exists', async () => {
 			assert.strictEqual(blogWithZeroLikes.likes, 0)
 		})
 
-		test.only('blog without title returns 400BadRequest', async () => {
+		test('blog without title returns 400BadRequest', async () => {
 			const response = await api
 				.post('/api/blogs/')
 				.send(testBlogs[4])
@@ -114,7 +114,7 @@ describe('When only a single blog with 60 likes exists', async () => {
 			assert(response.body.error.includes('title is required'))
 		})
 
-		test.only('blog without url returns 400BadRequest', async () => {
+		test('blog without url returns 400BadRequest', async () => {
 			const response = await api
 				.post('/api/blogs/')
 				.send(testBlogs[5])
@@ -122,7 +122,7 @@ describe('When only a single blog with 60 likes exists', async () => {
 			assert(response.body.error.includes('url is required'))
 		})
 
-		test.only('blog with no url and author returns 400BadRequest', async () => {
+		test('blog with no url and author returns 400BadRequest', async () => {
 			const response = await api
 				.post('/api/blogs/')
 				.send(testBlogs[6])
@@ -135,28 +135,28 @@ describe('When only a single blog with 60 likes exists', async () => {
 	})
 
 	describe('to delete a blog', async () => {
-		test.only('returns successfully deleted', async () => {
+		test('returns successfully deleted', async () => {
 			const blogTodelete = testBlogs[0]._id
 			const response = await api.delete(`/api/blogs/${blogTodelete}`).expect(200)
 			assert(Object.prototype.hasOwnProperty.call(response.body, 'message'))
 			assert.strictEqual(`a blog with id ${blogTodelete} has been deleted`, response.body.message)
 		})
 
-		test.only('with a bad id returns 400BadRequest', async () => {
+		test('with a bad id returns 400BadRequest', async () => {
 			const badId = '1234shsioeerq'
 			const response = await api.delete(`/api/blogs/${badId}`).expect(400)
 			assert(Object.prototype.hasOwnProperty.call(response.body, 'error'))
 			assert(response.body.error.includes('bad id'))
 		})
 
-		test.only('which doesnt exist returns 204NoContent', async () => {
+		test('which doesnt exist returns 204NoContent', async () => {
 			const nonexistentId = '67d41ea7f6697e92337c4f3f'
 			await api.delete(`/api/blogs/${nonexistentId}`).expect(204)
 		})
 	})
 
 	describe('to update a blog', async () => {
-		test.only('with new number of likes returns correct likes', async () => {
+		test('with new number of likes returns correct likes', async () => {
 			const blogToUpdate = testBlogs[0]._id
 			const newLikes = 400
 			testBlogs[0].likes = newLikes
@@ -164,7 +164,7 @@ describe('When only a single blog with 60 likes exists', async () => {
 			assert.strictEqual(response.body.likes, newLikes)
 		})
 
-		test.only('without title or url throws validation error', async () => {
+		test('without title or url throws validation error', async () => {
 			const blogToUpdate = testBlogs[0]._id
 			const randomNumber = Math.floor(Math.random() * 10)
 			randomNumber % 2 === 0 ? testBlogs[0].title = null : testBlogs[0].url = null
