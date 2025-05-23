@@ -36,6 +36,10 @@ beforeEach(async () => {
 })
 
 describe('When no user exists', async () => {
+	test('getting users should return no users', async () => {
+		await api.get('/api/users/').expect(404).expect('Content-Type', /json/)
+	})
+
 	test('adding a user returns 201Created', async () => {
 		const userToAdd = userList[0]
 		await api
@@ -56,10 +60,18 @@ describe('When no user exists', async () => {
 		assert.strictEqual(response.body.name, userToAdd.name)
 		assert(!Object.prototype.hasOwnProperty.call(response.body, 'passwordHash'))
 	})
+})
 
-	after(async () => {
-		console.log('closing connection...')
-		await mongoose.connection.close()
-		console.log('closed')
+describe('When one or more users exists', async () => {
+	test('/api/users should return 200 OK', async () => {
+		const dataToSend = userList[0]
+		await api.post('/api/users').send(dataToSend)
+		await api.get('/api/users').expect(200).expect('Content-Type', /json/)
 	})
+})
+
+after(async () => {
+	console.log('closing connection...')
+	await mongoose.connection.close()
+	console.log('closed')
 })
