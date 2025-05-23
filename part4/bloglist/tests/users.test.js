@@ -1,5 +1,5 @@
 const { describe, beforeEach, after, test } = require('node:test')
-//const assert = require('node:assert')
+const assert = require('node:assert')
 const mongoose = require('mongoose')
 const app = require('../app')
 const supertest = require('supertest')
@@ -15,24 +15,46 @@ const userList = [
 		password: 'cosaki',
 		blogs: [],
 	},
+	{
+		name: 'Collins Kipepe',
+		username: 'cosaki',
+		password: 'cosaki2',
+		blogs: [],
+	},
+	{
+		name: 'John Doe',
+		username: 'johndoe',
+		password: 'jondoe',
+		blogs: [],
+	},
 ]
 
-describe('When no user exists', async () => {
-	beforeEach(async () => {
-		console.log('deleting existing users...')
-		await User.deleteMany({})
-		console.log('existing users deleted')
-	})
+beforeEach(async () => {
+	console.log('deleting all users')
+	await User.deleteMany({})
+	console.log('all users deleted')
+})
 
-	test.only('adding a user returns 201Created', async () => {
-		console.log('starting to test..')
-		const userToAdd = userList[1]
-		console.log('user data: ', userToAdd)
+describe('When no user exists', async () => {
+	test('adding a user returns 201Created', async () => {
+		const userToAdd = userList[0]
 		await api
 			.post('/api/users/')
 			.send(userToAdd)
 			.expect(201)
 			.expect('Content-Type', /json/)
+	})
+
+	test('adding a user returns a user object with no password', async () => {
+		const userToAdd = userList[0]
+		const response = await api
+			.post('/api/users/')
+			.send(userToAdd)
+			.expect('Content-Type', /json/)
+
+		assert(Object.prototype.hasOwnProperty.call(response.body, 'id'))
+		assert.strictEqual(response.body.name, userToAdd.name)
+		assert(!Object.prototype.hasOwnProperty.call(response.body, 'passwordHash'))
 	})
 
 	after(async () => {

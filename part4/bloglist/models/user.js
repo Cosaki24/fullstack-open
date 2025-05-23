@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
 		required: [true, 'username is required'],
 		unique: true,
 	},
-	passwordHash: String,
+	passwordHash: { type: String, required: [true, 'password is required'] },
 	blogs: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
