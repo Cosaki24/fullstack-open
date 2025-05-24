@@ -70,6 +70,114 @@ describe('When one or more users exists', async () => {
 	})
 })
 
+describe('Creating a new user', async () => {
+	test('with no username should return 400 bad request', async () => {
+		const userWithNoUsername = {
+			name: 'Collins Kipepe',
+			username: '',
+			password: 'johndoe',
+			blogs: [],
+		}
+
+		const response = await api
+			.post('/api/users')
+			.send(userWithNoUsername)
+			.expect(400)
+			.expect('Content-Type', /json/)
+
+		assert.strictEqual(response.body.error, 'ValidationError')
+		assert(response.body.message.includes('username'))
+	})
+
+	test('with a username less than 3 characters should return 400 bad request', async () => {
+		const userWithShortUsername = {
+			name: 'Collins Kipepe',
+			username: 'ck',
+			password: 'jajajaja',
+			blogs: [],
+		}
+
+		const response = await api
+			.post('/api/users')
+			.send(userWithShortUsername)
+			.expect(400)
+			.expect('Content-Type', /json/)
+
+		assert.strictEqual(response.body.error, 'ValidationError')
+		assert(
+			response.body.message.includes(
+				`${userWithShortUsername.username} is too short`
+			)
+		)
+	})
+
+	test('with an existing username should return 400 bad request', async () => {
+		const user = {
+			name: 'Collins Kipepe',
+			username: 'Cosaki',
+			password: 'jajajajaja',
+			blogs: [],
+		}
+
+		const parody = {
+			name: 'Collins Kipepe Jr',
+			username: 'Cosaki',
+			password: 'jajajajaja',
+		}
+
+		await api
+			.post('/api/users')
+			.send(user)
+			.expect(201)
+			.expect('Content-Type', /json/)
+
+		const response = await api
+			.post('/api/users')
+			.send(parody)
+			.expect(400)
+			.expect('Content-Type', /json/)
+
+		assert.strictEqual(response.body.error, 'DuplicateKeyError')
+		assert.strictEqual(response.body.message, 'Username already exists')
+	})
+
+	test('without a password should return 400 bad request', async () => {
+		const userWithNoPassword = {
+			name: 'Collins Kipepe',
+			password: '',
+			username: 'csk',
+			blogs: [],
+		}
+
+		const response = await api
+			.post('/api/users')
+			.send(userWithNoPassword)
+			.expect(400)
+			.expect('Content-Type', /json/)
+
+		assert.strictEqual(response.body.error, 'ValidationError') // not Mongoose ValidationError
+		assert.strictEqual(response.body.message, 'Password is required')
+	})
+
+	test('with a short password should return 400 bad request', async () => {
+		const userWithShortPassword = {
+			name: 'Collins Kipepe',
+			username: 'csk',
+			password: 'ja',
+			blogs: [],
+		}
+
+		const response = await api
+			.post('/api/users')
+			.send(userWithShortPassword)
+			.expect(400)
+			.expect('Content-Type', /json/)
+
+		assert.strictEqual(response.body.error, 'ValidationError')
+		assert(response.body.message.includes('Password too short'))
+	})
+})
+
 after(async () => {
 	console.log('closing connection...')
 	await mongoose.connection.close()

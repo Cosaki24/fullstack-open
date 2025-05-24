@@ -17,7 +17,7 @@ userRouter.post('/', async (request, response) => {
 	const { name, username, password } = request.body
 
 	const saltRounds = 10
-	if (password) {
+	if (password && password.length >= 3) {
 		const passwordHash = await bcrypt.hash(password, saltRounds)
 		const user = new User({
 			name,
@@ -29,10 +29,41 @@ userRouter.post('/', async (request, response) => {
 			const result = await user.save()
 			return response.status(201).json(result)
 		} catch (error) {
-			return response.status(400).json({ error: error })
+			switch (error.name) {
+			case 'ValidationError':
+				return response
+					.status(400)
+					.json({ error: error.name, message: error.message })
+			case 'MongoServerError':
+				if (error.message.includes('E11000 duplicate key error')) {
+					return response.status(400).json({
+						error: 'DuplicateKeyError',
+						message: 'Username already exists',
+					})
+				} else {
+					return response
+						.status(400)
+						.json({ error: error.name, message: error.message })
+				}
+			default:
+				return response
+					.status(400)
+					.json({ error: error.name, message: error.message })
+			}
 		}
 	} else {
-		return response.status(400).json({ error: 'password is required' })
+		if (password && password.length < 3) {
+			return response
+				.status(400)
+				.json({
+					error: 'ValidationError',
+					message: 'Password too short, 3 minimum characters required',
+				})
+		} else {
+			return response
+				.status(400)
+				.json({ error: 'ValidationError', message: 'Password is required' })
+		}
 	}
 })
 

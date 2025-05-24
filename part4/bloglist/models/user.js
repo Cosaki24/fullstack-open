@@ -1,13 +1,14 @@
 const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
-	name: { type: String, required: [true, 'name is required'] },
+	name: { type: String, required: [true, 'required'] },
 	username: {
 		type: String,
-		required: [true, 'username is required'],
+		required: [true, 'required'],
 		unique: true,
+		minLength: [3, 'Minimum characters is 3, {VALUE} is too short!']
 	},
-	passwordHash: { type: String, required: [true, 'password is required'] },
+	passwordHash: { type: String, required: [true, 'required'] },
 	blogs: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
