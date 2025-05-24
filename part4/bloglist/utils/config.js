@@ -3,6 +3,7 @@ const logger = require('./logger')
 const mongoClient = require('mongodb-memory-server')
 
 const PORT = process.env.PORT
+const JWT_SECRET = process.env.JWT_SECRET
 let db
 
 const initializeDB = async () => {
@@ -33,4 +34,5 @@ module.exports = {
 	loadDbConfig,
 	PORT,
 	db,
+	JWT_SECRET
 }
