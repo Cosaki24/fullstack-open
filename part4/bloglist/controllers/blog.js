@@ -9,11 +9,10 @@ blogRouter.get('/', async (request, response) => {
 
 blogRouter.post('/', async (request, response) => {
 	const blogCreator = await User.findOne()
-
 	if (!blogCreator) {
 		return response
 			.status(400)
-			.json({ error: 'No user found. Insert atleast one user' })
+			.json({ error: 'No user found. At least one user must exist to create a blog' })
 	}
 
 	const body = request.body
@@ -28,6 +27,8 @@ blogRouter.post('/', async (request, response) => {
 
 	try {
 		const result = await blog.save()
+		blogCreator.blogs = blogCreator.blogs.concat(result._id) // insert the blog id to the array of blogs owned by the user
+		await blogCreator.save() // save it back to the database
 		return response.status(201).json(result)
 	} catch (error) {
 		if (error.name === 'ValidationError') {

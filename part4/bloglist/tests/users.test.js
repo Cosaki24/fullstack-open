@@ -178,6 +178,31 @@ describe('Creating a new user', async () => {
 	})
 })
 
+describe('When blogs exist', async () => {
+	test('retrieving users, should return with the blogs they created', async() => {
+		// creating a user
+		await api.post('/api/users').send(userList[0]).expect(201).expect('Content-Type', /json/)
+
+		// creating a blog, should automatically be assigned with the user just created
+		const aNewBlog = {
+			title: 'A blog with user',
+			author: 'Random Author',
+			url: 'https://localhost/blog',
+			likes: 0,
+		}
+
+		await api.post('/api/blogs/').send(aNewBlog).expect(201).expect('Content-Type', /json/)
+
+		const response = await api.get('/api/users/').expect(200).expect('Content-Type', /json/)
+
+		console.log(response.body[0].blogs)
+		assert.strictEqual(response.body.length, 1)
+		assert.strictEqual(response.body[0].blogs.length, 1)
+		assert(Object.prototype.hasOwnProperty.call(response.body[0].blogs[0], 'title'))
+		assert.strictEqual(response.body[0].blogs[0].title, aNewBlog.title)
+	})
+})
+
 after(async () => {
 	console.log('closing connection...')
 	await mongoose.connection.close()

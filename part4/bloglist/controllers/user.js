@@ -4,7 +4,11 @@ const User = require('../models/user')
 
 userRouter.get('/', async (request, response) => {
 	try {
-		const result = await User.find({})
+		const result = await User.find({}).populate('blogs', {
+			title: 1,
+			url: 1,
+			author: 1,
+		})
 		if (result.length > 0) {
 			return response.status(200).json(result)
 		}
@@ -53,12 +57,10 @@ userRouter.post('/', async (request, response) => {
 		}
 	} else {
 		if (password && password.length < 3) {
-			return response
-				.status(400)
-				.json({
-					error: 'ValidationError',
-					message: 'Password too short, 3 minimum characters required',
-				})
+			return response.status(400).json({
+				error: 'ValidationError',
+				message: 'Password too short, 3 minimum characters required',
+			})
 		} else {
 			return response
 				.status(400)
