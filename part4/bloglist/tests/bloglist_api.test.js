@@ -4,8 +4,16 @@ const mongoose = require('mongoose')
 const app = require('../app')
 const supertest = require('supertest')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
+
+const firstUser = {
+	name: 'Collins Kipepe',
+	username: 'firstUser',
+	password: 'csk',
+	blogs: [],
+}
 
 let testBlogs = [
 	{
@@ -51,7 +59,11 @@ let testBlogs = [
 describe('When only a single blog with 60 likes exists', async () => {
 	beforeEach(async () => {
 		await Blog.deleteMany({})
-		let blogObject = new Blog(testBlogs[0])
+		await User.deleteMany({})
+		await api.post('/api/users').send(firstUser)
+		const user = await User.findOne()
+		const firstBlog = { ...testBlogs[0], user: user._id }
+		let blogObject = new Blog(firstBlog)
 		await blogObject.save()
 	})
 
@@ -132,14 +144,57 @@ describe('When only a single blog with 60 likes exists', async () => {
 					response.body.error.includes('title is required')
 			)
 		})
+
+		test('a new blog a user is attached', async () => {
+			const aNewBlog = {
+				title: 'A blog with user',
+				author: 'Random Author',
+				url: 'https://localhost/blog',
+				likes: 0,
+			}
+
+			const response = await api
+				.post('/api/blogs')
+				.send(aNewBlog)
+				.expect(201)
+				.expect('Content-Type', /json/)
+
+			assert(Object.prototype.hasOwnProperty.call(response.body, 'user'))
+			assert(response.body.user)
+		})
+
+		test('a blog with user id, we can get blogs and their creators', async () => {
+			const aNewBlog = {
+				title: 'A blog with user',
+				author: 'Random Author',
+				url: 'https://localhost/blog',
+				likes: 0,
+			}
+
+			await api
+				.post('/api/blogs')
+				.send(aNewBlog)
+				.expect(201)
+				.expect('Content-Type', /json/)
+
+			const response = await api.get('/api/blogs').expect(200)
+
+			assert(response.body.every(blog => Object.prototype.hasOwnProperty.call(blog.user, 'id')))
+			assert(response.body.every(blog => blog.user.id))
+		})
 	})
 
 	describe('to delete a blog', async () => {
 		test('returns successfully deleted', async () => {
 			const blogTodelete = testBlogs[0]._id
-			const response = await api.delete(`/api/blogs/${blogTodelete}`).expect(200)
+			const response = await api
+				.delete(`/api/blogs/${blogTodelete}`)
+				.expect(200)
 			assert(Object.prototype.hasOwnProperty.call(response.body, 'message'))
-			assert.strictEqual(`a blog with id ${blogTodelete} has been deleted`, response.body.message)
+			assert.strictEqual(
+				`a blog with id ${blogTodelete} has been deleted`,
+				response.body.message
+			)
 		})
 
 		test('with a bad id returns 400BadRequest', async () => {
@@ -160,15 +215,23 @@ describe('When only a single blog with 60 likes exists', async () => {
 			const blogToUpdate = testBlogs[0]._id
 			const newLikes = 400
 			testBlogs[0].likes = newLikes
-			const response = await api.put(`/api/blogs/${blogToUpdate}`).send(testBlogs[0]).expect(200)
+			const response = await api
+				.put(`/api/blogs/${blogToUpdate}`)
+				.send(testBlogs[0])
+				.expect(200)
 			assert.strictEqual(response.body.likes, newLikes)
 		})
 
 		test('without title or url throws validation error', async () => {
 			const blogToUpdate = testBlogs[0]._id
 			const randomNumber = Math.floor(Math.random() * 10)
-			randomNumber % 2 === 0 ? testBlogs[0].title = null : testBlogs[0].url = null
-			const response = await api.put(`/api/blogs/${blogToUpdate}`).send(testBlogs[0]).expect(400)
+			randomNumber % 2 === 0
+				? (testBlogs[0].title = null)
+				: (testBlogs[0].url = null)
+			const response = await api
+				.put(`/api/blogs/${blogToUpdate}`)
+				.send(testBlogs[0])
+				.expect(400)
 			assert.strictEqual(response.body.error, 'title or url is missing')
 		})
 	})

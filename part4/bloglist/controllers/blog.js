@@ -1,13 +1,30 @@
 const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 blogRouter.get('/', async (request, response) => {
-	const result = await Blog.find({})
+	const result = await Blog.find({}).populate('user', { name: 1, username: 1 })
 	return response.json(result)
 })
 
 blogRouter.post('/', async (request, response) => {
-	const blog = new Blog(request.body)
+	const blogCreator = await User.findOne()
+
+	if (!blogCreator) {
+		return response
+			.status(400)
+			.json({ error: 'No user found. Insert atleast one user' })
+	}
+
+	const body = request.body
+
+	const blog = new Blog({
+		title: body.title,
+		author: body.author,
+		likes: body.likes,
+		url: body.url,
+		user: blogCreator._id,
+	})
 
 	try {
 		const result = await blog.save()
