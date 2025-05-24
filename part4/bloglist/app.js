@@ -25,7 +25,7 @@ const startServer = async () => {
 			app.use('/api/blogs', blogRouter)
 			app.use('/api/users', userRouter)
 		} catch (error) {
-			logger.error('Error connection to mongoDB: ', error.message)
+			logger.error('Error connecting to mongoDB: ', error.message)
 		}
 	}
 }

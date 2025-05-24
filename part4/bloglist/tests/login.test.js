@@ -65,7 +65,7 @@ test('Signing in with incorrect password should fail', async () => {
 })
 
 after(async () => {
-	console.log('closing connection...')
 	await mongoose.connection.close()
-	console.log('closed')
+	console.log('closing connection...')
+	process.exit(0)
 })

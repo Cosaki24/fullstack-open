@@ -56,6 +56,12 @@ let testBlogs = [
 	},
 ]
 
+// create a login helper function
+const getJwtToken = async (username, password) => {
+	const response = await api.post('/api/login').send({ username, password })
+	return response.body.token
+}
+
 describe('When only a single blog with 60 likes exists', async () => {
 	beforeEach(async () => {
 		await Blog.deleteMany({})
@@ -90,8 +96,10 @@ describe('When only a single blog with 60 likes exists', async () => {
 
 	describe('to insert', async () => {
 		test('api can add one blog into the database', async () => {
+			const token = await getJwtToken('firstUser', 'csk')
 			await api
 				.post('/api/blogs/')
+				.set('Authorization', `Bearer ${token}`)
 				.send(testBlogs[1])
 				.expect(201)
 				.expect('Content-Type', /json/)
@@ -104,8 +112,10 @@ describe('When only a single blog with 60 likes exists', async () => {
 		})
 
 		test('blog without likes returns zero likes', async () => {
+			const token = await getJwtToken('firstUser', 'csk')
 			await api
 				.post('/api/blogs/')
+				.set('Authorization', `Bearer ${token}`)
 				.send(testBlogs[3])
 				.expect(201)
 				.expect('Content-Type', /json/)
@@ -119,24 +129,30 @@ describe('When only a single blog with 60 likes exists', async () => {
 		})
 
 		test('blog without title returns 400BadRequest', async () => {
+			const token = await getJwtToken('firstUser', 'csk')
 			const response = await api
 				.post('/api/blogs/')
+				.set('Authorization', `Bearer ${token}`)
 				.send(testBlogs[4])
 				.expect(400)
 			assert(response.body.error.includes('title is required'))
 		})
 
 		test('blog without url returns 400BadRequest', async () => {
+			const token = await getJwtToken('firstUser', 'csk')
 			const response = await api
 				.post('/api/blogs/')
+				.set('Authorization', `Bearer ${token}`)
 				.send(testBlogs[5])
 				.expect(400)
 			assert(response.body.error.includes('url is required'))
 		})
 
 		test('blog with no url and author returns 400BadRequest', async () => {
+			const token = await getJwtToken('firstUser', 'csk')
 			const response = await api
 				.post('/api/blogs/')
+				.set('Authorization', `Bearer ${token}`)
 				.send(testBlogs[6])
 				.expect(400)
 			assert(
@@ -146,6 +162,7 @@ describe('When only a single blog with 60 likes exists', async () => {
 		})
 
 		test('a new blog a user is attached', async () => {
+			const token = await getJwtToken('firstUser', 'csk')
 			const aNewBlog = {
 				title: 'A blog with user',
 				author: 'Random Author',
@@ -155,6 +172,7 @@ describe('When only a single blog with 60 likes exists', async () => {
 
 			const response = await api
 				.post('/api/blogs')
+				.set('Authorization', `Bearer ${token}`)
 				.send(aNewBlog)
 				.expect(201)
 				.expect('Content-Type', /json/)
@@ -164,6 +182,32 @@ describe('When only a single blog with 60 likes exists', async () => {
 		})
 
 		test('a blog with user id, we can get blogs and their creators', async () => {
+			const token = await getJwtToken('firstUser', 'csk')
+			const aNewBlog = {
+				title: 'A blog with user',
+				author: 'Random Author',
+				url: 'https://localhost/blog',
+				likes: 0,
+			}
+
+			await api
+				.post('/api/blogs')
+				.set('Authorization', `Bearer ${token}`)
+				.send(aNewBlog)
+				.expect(201)
+				.expect('Content-Type', /json/)
+
+			const response = await api.get('/api/blogs').expect(200)
+
+			assert(
+				response.body.every((blog) =>
+					Object.prototype.hasOwnProperty.call(blog.user, 'id')
+				)
+			)
+			assert(response.body.every((blog) => blog.user.id))
+		})
+
+		test('a blog without user token, returns 401 unauthorized', async () => {
 			const aNewBlog = {
 				title: 'A blog with user',
 				author: 'Random Author',
@@ -174,13 +218,8 @@ describe('When only a single blog with 60 likes exists', async () => {
 			await api
 				.post('/api/blogs')
 				.send(aNewBlog)
-				.expect(201)
+				.expect(401)
 				.expect('Content-Type', /json/)
-
-			const response = await api.get('/api/blogs').expect(200)
-
-			assert(response.body.every(blog => Object.prototype.hasOwnProperty.call(blog.user, 'id')))
-			assert(response.body.every(blog => blog.user.id))
 		})
 	})
 
@@ -238,5 +277,7 @@ describe('When only a single blog with 60 likes exists', async () => {
 
 	after(async () => {
 		await mongoose.connection.close()
+		console.log('Closing connection...')
+		process.exit(0)
 	})
 })

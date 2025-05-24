@@ -29,6 +29,12 @@ const userList = [
 	},
 ]
 
+// create a login helper function
+const getJwtToken = async (username, password) => {
+	const response = await api.post('/api/login').send({ username, password })
+	return response.body.token
+}
+
 beforeEach(async () => {
 	console.log('deleting all users')
 	await User.deleteMany({})
@@ -179,9 +185,15 @@ describe('Creating a new user', async () => {
 })
 
 describe('When blogs exist', async () => {
-	test('retrieving users, should return with the blogs they created', async() => {
+	test('retrieving users, should return with the blogs they created', async () => {
 		// creating a user
-		await api.post('/api/users').send(userList[0]).expect(201).expect('Content-Type', /json/)
+		await api
+			.post('/api/users')
+			.send(userList[0])
+			.expect(201)
+			.expect('Content-Type', /json/)
+
+		const token = await getJwtToken(userList[0].username, userList[0].password)
 
 		// creating a blog, should automatically be assigned with the user just created
 		const aNewBlog = {
@@ -191,20 +203,29 @@ describe('When blogs exist', async () => {
 			likes: 0,
 		}
 
-		await api.post('/api/blogs/').send(aNewBlog).expect(201).expect('Content-Type', /json/)
+		await api
+			.post('/api/blogs/')
+			.set('Authorization', `Bearer ${token}`)
+			.send(aNewBlog)
+			.expect(201)
+			.expect('Content-Type', /json/)
 
-		const response = await api.get('/api/users/').expect(200).expect('Content-Type', /json/)
+		const response = await api
+			.get('/api/users/')
+			.expect(200)
+			.expect('Content-Type', /json/)
 
-		console.log(response.body[0].blogs)
 		assert.strictEqual(response.body.length, 1)
 		assert.strictEqual(response.body[0].blogs.length, 1)
-		assert(Object.prototype.hasOwnProperty.call(response.body[0].blogs[0], 'title'))
+		assert(
+			Object.prototype.hasOwnProperty.call(response.body[0].blogs[0], 'title')
+		)
 		assert.strictEqual(response.body[0].blogs[0].title, aNewBlog.title)
 	})
 })
 
 after(async () => {
-	console.log('closing connection...')
 	await mongoose.connection.close()
-	console.log('closed')
+	console.log('closing connection...')
+	process.exit(0)
 })
