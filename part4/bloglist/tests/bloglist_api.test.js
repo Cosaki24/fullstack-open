@@ -215,7 +215,7 @@ describe('When only a single blog with 60 likes exists', async () => {
 			assert(response.body.every((blog) => blog.user.id))
 		})
 
-		test('a blog without user token, returns 401 unauthorized', async () => {
+		test('a blog if token not provided, returns 401 unauthorized', async () => {
 			const aNewBlog = {
 				title: 'A blog with user',
 				author: 'Random Author',
