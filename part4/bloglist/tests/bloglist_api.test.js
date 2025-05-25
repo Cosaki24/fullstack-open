@@ -15,6 +15,13 @@ const firstUser = {
 	blogs: [],
 }
 
+const secondUser = {
+	name: 'Bad User',
+	username: 'deleter',
+	password: 'jajaja',
+	blogs: []
+}
+
 let testBlogs = [
 	{
 		title: 'Does organization matter?',
@@ -67,6 +74,7 @@ describe('When only a single blog with 60 likes exists', async () => {
 		await Blog.deleteMany({})
 		await User.deleteMany({})
 		await api.post('/api/users').send(firstUser)
+		await api.post('/api/users').send(secondUser)
 		const user = await User.findOne()
 		const firstBlog = { ...testBlogs[0], user: user._id }
 		let blogObject = new Blog(firstBlog)
@@ -225,9 +233,28 @@ describe('When only a single blog with 60 likes exists', async () => {
 
 	describe('to delete a blog', async () => {
 		test('returns successfully deleted', async () => {
-			const blogTodelete = testBlogs[0]._id
+			const token = await getJwtToken('firstUser', 'csk')
+
+			// add a blog with user firstUser
+			const aNewBlog = {
+				title: 'A blog with user',
+				author: 'Random Author',
+				url: 'https://localhost/blog',
+				likes: 0,
+			}
+
+			const blog = await api
+				.post('/api/blogs')
+				.set('Authorization', `Bearer ${token}`)
+				.send(aNewBlog)
+				.expect(201)
+				.expect('Content-Type', /json/)
+
+			const blogTodelete = blog.body.id
+
 			const response = await api
 				.delete(`/api/blogs/${blogTodelete}`)
+				.set('Authorization', `Bearer ${token}`)
 				.expect(200)
 			assert(Object.prototype.hasOwnProperty.call(response.body, 'message'))
 			assert.strictEqual(
@@ -237,15 +264,40 @@ describe('When only a single blog with 60 likes exists', async () => {
 		})
 
 		test('with a bad id returns 400BadRequest', async () => {
+			const token = await getJwtToken('firstUser', 'csk')
 			const badId = '1234shsioeerq'
-			const response = await api.delete(`/api/blogs/${badId}`).expect(400)
+			const response = await api
+				.delete(`/api/blogs/${badId}`)
+				.set('Authorization', `Bearer ${token}`)
+				.expect(400)
 			assert(Object.prototype.hasOwnProperty.call(response.body, 'error'))
 			assert(response.body.error.includes('bad id'))
 		})
 
 		test('which doesnt exist returns 204NoContent', async () => {
+			const token = await getJwtToken('firstUser', 'csk')
 			const nonexistentId = '67d41ea7f6697e92337c4f3f'
-			await api.delete(`/api/blogs/${nonexistentId}`).expect(204)
+			await api
+				.delete(`/api/blogs/${nonexistentId}`)
+				.set('Authorization', `Bearer ${token}`)
+				.expect(204)
+		})
+
+		test('with a different user returns 403 forbidden', async () => {
+			const token = await getJwtToken(secondUser.username, secondUser.password)
+			const blogToDelete = testBlogs[0]._id
+
+			const response = await api
+				.delete(`/api/blogs/${blogToDelete}`)
+				.set('Authorization', `Bearer ${token}`)
+				.expect(403)
+				.expect('Content-Type', /json/)
+
+			assert.strictEqual(response.body.error, 'Forbidden')
+			assert.strictEqual(
+				response.body.message,
+				'You do not have enough permissions'
+			)
 		})
 	})
 
