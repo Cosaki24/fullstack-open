@@ -18,7 +18,7 @@ export default [
 		},
 		rules: {
 			'@stylistic/js/indent': ['error', 'tab'],
-			'@stylistic/js/linebreak-style': ['error', 'windows'],
+			'@stylistic/js/linebreak-style': ['error', 'linux'],
 			'@stylistic/js/quotes': ['error', 'single'],
 			'@stylistic/js/semi': ['error', 'never'],
 			'eqeqeq': 'error',

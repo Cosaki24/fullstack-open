@@ -4,8 +4,13 @@ import LoginForm from './components/LoginForm'
 import blogService from './services/blog'
 import loginService from './services/login'
 
+const getStoredUser = () => {
+  const user = window.localStorage.getItem('blogListUser')
+  return user ? JSON.parse(user) : null
+}
+
 const App = () => {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState(getStoredUser())
   const [loginError, setLoginError] = useState(null)
   const [blogs, setBlogs] = useState([])
 
@@ -21,7 +26,7 @@ const App = () => {
       }
     }
     fetchBlogs()
-  }, [])
+  }, [user])
 
   const handleLogin = async (formData) => {
     const credentials = {
@@ -30,20 +35,24 @@ const App = () => {
     }
     try {
       let user = await loginService.login(credentials)
+      window.localStorage.setItem('blogListUser', JSON.stringify(user))
       setUser(user)
       setLoginError(null)
-      const initialBlogs = await blogService.getAll()
-      setBlogs(initialBlogs)
     }
     catch (error) {
-      setLoginError(error.response.data.message || 'Unknown error: Login failed')
+      setLoginError(error.response?.data?.message || 'Unknown error: Login failed')
       setUser(null)
     }
   }
 
+  const handleLogout = () => {
+    window.localStorage.removeItem('blogListUser')
+    setUser(null)
+  }
+
   return (
     <>
-      {user ? <BlogList user={user} blogs={blogs} /> : <LoginForm handleLogin={handleLogin} loginError={loginError} />}
+      {user ? <BlogList user={user} blogs={blogs} handleLogout={handleLogout} /> : <LoginForm handleLogin={handleLogin} loginError={loginError} />}
     </>
   )
 }
