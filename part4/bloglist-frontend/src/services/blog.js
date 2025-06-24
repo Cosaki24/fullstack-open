@@ -6,4 +6,14 @@ const getAll = async () => {
     return response.data;
 }
 
-export default { getAll };
+const addBlog = async (blogDetails) => {
+    let authHeader = {
+        'Authorization': `Bearer ${JSON.parse(window.localStorage.getItem('blogListUser')).token}`
+    };
+    const response = await axios.post(baseUrl, blogDetails, { headers: authHeader });
+    if (response.status === 201 ){
+        return response.data;
+    }
+}
+
+export default { getAll, addBlog };
