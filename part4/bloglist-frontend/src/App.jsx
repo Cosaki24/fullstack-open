@@ -13,6 +13,7 @@ const App = () => {
 	const [user, setUser] = useState(getStoredUser())
 	const [loginError, setLoginError] = useState(null)
 	const [message, setMessage] = useState(null)
+	const [error, setError] = useState(null)
 	const [blogs, setBlogs] = useState([])
 
 	useEffect(() => {
@@ -28,6 +29,16 @@ const App = () => {
 		}
 		fetchBlogs()
 	}, [user])
+
+	useEffect(() => {
+		if (message || error) {
+			const timer = setTimeout(() => {
+				setMessage(null)
+				setError(null)
+			}, 5000)
+			return () => clearTimeout(timer)
+		}
+	}, [message, error])
 
 	const handleLogin = async (formData) => {
 		const credentials = {
@@ -68,7 +79,7 @@ const App = () => {
 				)
 			}
 		} catch (error) {
-			setMessage(
+			setError(
 				error.response?.data?.error ||
 					'Unknown error: Adding blog failed'
 			)
@@ -77,7 +88,8 @@ const App = () => {
 
 	return (
 		<>
-			{message && <p>{message}</p>}
+			{message && <p style={{ color: 'green' }}>{message}</p>}
+			{error && <p style={{ color: 'red' }}>{error}</p>}
 			{user ? (
 				<BlogList
 					handleAddBlog={handleAddBlog}
